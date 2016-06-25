@@ -1,0 +1,37 @@
+ db.redeem.aggregate([{$unwind:"$user"},{$unwind:"$user.shop_history"}, {$group:{_id:"$user.cardno",total:{$sum:"$user.shop_history.product_price"}}}]);
+db.redeem.aggregate([{$unwind:"$user"},{$unwind:"$user.shop_history"}, {$group:{_id:"$user.cardno",total:{$sum:"$user.shop_history.product_price"}}}]);
+var map=function(){ for(var idx=0;idx<this.user.length;idx++){var key=this.user[idx].cardno;for(var id=0;id<this.shop_history.length;id++){var value=this.user[idx].shop_history[id].product_price}}}
+>var map=function(){ for(var idx=0;idx<this.user.length;idx++){var key=this.user[idx].cardno;for(var id=0;id<this.user[idx].shop_history.length;id++){var value=this.user[idx].shop_history[id].product_price;emit(key,value);}}}
+> var reduce=function(keys,values){var sum=0;for(var id=0;id<values.length;id++){sum+=values[id]}return sum;};
+> db.redeem.mapReduce(map,reduce,{out:{inline:1}})
+{
+	"results" : [
+		{
+			"_id" : 51265201,
+			"value" : "105650700013200180"
+		},
+		{
+			"_id" : 51265202,
+			"value" : 17300
+		},
+		{
+			"_id" : 51265203,
+			"value" : 99850
+		},
+		{
+			"_id" : 51265204,
+			"value" : 54000
+		}
+	],
+	"timeMillis" : 1,
+	"counts" : {
+		"input" : 1,
+		"emit" : 17,
+		"reduce" : 3,
+		"output" : 4
+	},
+	"ok" : 1
+}
+> var map=function(){ for(var idx=0;idx<this.user.length;idx++){for(var id=0;id<this.user[idx].shop_history.length;id++){var key=this.user[idx].shop_history[id].id;var value=1;emit(key,value);}}}
+> var reduce=function(keys,values){var sum=0;for(var id=0;id<values.length;id++){sum+=values[id]}return sum;};
+> db.redeem.mapReduce(map,reduce,{out:{inline:1}},{max:{value:1}})
